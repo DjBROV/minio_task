@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    environment:
+      - MINIO_ACCESS_KEY=user1234
+      - MINIO_SECRET_KEY=password
+    volumes:
+      - clouds_minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: "server /data --console-address :9001" 
+  python-app:
+    build: .
+    container_name: python-app
+    depends_on:
+      - minio
+    environment:
+      - MINIO_ACCESS_KEY=user1234
+      - MINIO_SECRET_KEY=password
+    volumes:
+      - ./files:/app/input_files
+volumes:
+  clouds_minio_data:
+    external: true
