@@ -80,7 +80,7 @@
 
 Во время данных процедур в консоли мы увидим различную выходную информацию, а дальше сообщение об ошибке (имена файлов в примере были a, b, c):
 
-`minio.error.S3Error: S3 operation failed; code: IncompleteBody, message: You did not provide the number of bytes specified by the Content-Length HTTP header., resource: /mybucket/a, request_id: 18141DC85142D0F8, host_id: dd9025bab4ad464b049177c95eb6ebf374d3b3fd1af9251148b658df7ac2e3e8, bucket_name: mybucket, object_name: a`
+`minio.error.S3Error: S3 operation failed; code: IncompleteBody, message: You did not provide the number of bytes specified by the Content-Length HTTP header.`
 
 Теперь посмотрим на содержимое сервера MinIO, для этого:
 
