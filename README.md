@@ -35,11 +35,18 @@
 `wget https://dl.min.io/server/minio/release/linux-amd64/archive/minio_20241213221912.0.0_amd64.deb -O minio.deb`  
 `sudo dpkg -i minio.deb`  
 
-Также нам понадобятся некоторые образы, получаемые через данные команды:
+Также нам понадобятся некоторые образы и определенные предустановки, получаемые через данные команды:
 
 `sudo docker pull python:3-slim`  
 
 `sudo docker pull minio/minio`  
+
+`curl https://dl.min.io/client/mc/release/linux-amd64/mc \
+  --create-dirs \
+  -o $HOME/minio-binaries/mc`
+
+`chmod +x $HOME/minio-binaries/mc
+export PATH=$PATH:$HOME/minio-binaries/`
 
 #### Основная часть
 
@@ -115,7 +122,7 @@ code: IncompleteBody означает, что файл разбивался на
 
 Снова зайдя по ссылке увидим, что в хранилище только 1 большой файл. Маленький файл не разбивался на блоки, и, судя по ошибке, множество раз пытался благодаря code.py загрузиться в хранилку , что не вышло из-за лимита.
 
-Окончив эксперимент, снова пропишем команду
+снова пропишем команду
 
 `sudo docker-compose down`
 
@@ -125,3 +132,19 @@ code: IncompleteBody означает, что файл разбивался на
 
 Тем самым освободив занятую нами память.
 
+Снова выделим память под эксперимент:
+
+`sudo docker volume create --driver local --opt type=tmpfs --opt device=tmpfs --opt o=size=100m clouds_minio_data`  
+
+Далее в папке файл создаем файл с размером в диапазоне 51-99 МБ и оставляем только его, после чего:
+
+`sudo docker-compose build` 
+
+`(sleep 3 && mc alias set myminio http://localhost:9000 myaccesskey mysecretkey &&  mc quota set myminio/mybucket --size 50Mi) & sudo docker-compose up`
+
+ Произойдет запуск контейнеров с автоматическим добавлением квоты в 50 МБ. Но при этом файл спокойно добавится в хранилище, несмотря на квоту. Объясняется это, быть может, медленной работой сканера, который не успевает обработать сканирующийся файл, пока тот успешно заносится в хранилище.
+Заканчивая эксперимент, пропишем заново команды:
+
+`sudo docker-compose down`
+
+`sudo docker volume rm clouds_minio_data`
