@@ -1,20 +1,13 @@
-from minio import Minio
-from minio.error import S3Error
 import os
 import time
-MINIO_ENDPOINT = "minio:9000"
+from minio import Minio
+from minio.error import S3Error
+
 USER = "user1234"
 PASSWORD = "password"
 BUCKET = "mybucket"
 INPUT = "/app/input_files"
-def connect():
-    client = Minio(
-        MINIO_ENDPOINT,
-        access_key = USER,
-        secret_key = PASSWORD,
-        secure=False
-    )
-    return client
+PORT = "minio:9000"
 def create(client, BUCKET):
     if not client.bucket_exists(BUCKET):
         client.make_bucket(BUCKET)
@@ -43,6 +36,14 @@ def upload_files(client, BUCKET, INPUT):
     
         else:
             print(f"'{file_name}' is not a file, skipping...")
+def connect():
+    client = Minio(
+        PORT,
+        access_key = USER,
+        secret_key = PASSWORD,
+        secure=False
+    )
+    return client
 if __name__ == "__main__":
     minio_client = connect()
 
